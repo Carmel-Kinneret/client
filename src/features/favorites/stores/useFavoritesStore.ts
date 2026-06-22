@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '@/lib/storage';
 
 interface FavoritesState {
@@ -34,7 +34,7 @@ export const useFavoritesStore = create<FavoritesState>()(
     }),
     {
       name: 'favorites-storage',
-      storage: zustandStorage,
+      storage: createJSONStorage(() => zustandStorage),
     }
   )
 );

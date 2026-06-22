@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { MapLibreGL, isMapLibreSupported } from '../utils/mapLibreLoader';
 import { LocationPoint } from '@/features/locations/types';
 import { useMapCamera } from '../hooks/useMapCamera';
 import { useMapStore } from '../stores/useMapStore';
-
-MapLibreGL.setAccessToken(null);
 
 interface MapViewProps {
   locations: LocationPoint[];
@@ -14,6 +12,23 @@ interface MapViewProps {
 export default function MapView({ locations }: MapViewProps) {
   const { cameraRef, flyTo } = useMapCamera();
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
+
+  // Fallback for users trying to run the app in Expo Go without native modules
+  if (!isMapLibreSupported || !MapLibreGL) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ef4444', textAlign: 'center' }}>
+          MapLibre Native Module Missing!
+        </Text>
+        <Text style={{ fontSize: 15, color: '#374151', textAlign: 'center', marginTop: 10 }}>
+          This app uses custom native code for mapping and storage that is not supported by the standard Expo Go app. 
+          Please compile a custom dev client using `npx expo run:android` or `npx eas build`.
+        </Text>
+      </View>
+    );
+  }
+
+  const MapLibre = MapLibreGL;
 
   // Convert locations to GeoJSON FeatureCollection
   const geojsonData = useMemo(
@@ -58,27 +73,28 @@ export default function MapView({ locations }: MapViewProps) {
 
   return (
     <View style={styles.container}>
-      <MapLibreGL.MapView
+      <MapLibre.Map
         style={styles.map}
-        styleURL="https://tiles.openfreemap.org/styles/liberty"
-        logoEnabled={false}
-        attributionEnabled={true}
+        mapStyle="https://tiles.openfreemap.org/styles/liberty"
+        logo={false}
+        attribution={true}
         attributionPosition={{ bottom: 8, right: 8 }}
       >
-        <MapLibreGL.Camera ref={cameraRef} zoomLevel={6} centerCoordinate={[34.8, 31.0]} />
-        <MapLibreGL.UserLocation visible={true} />
+        <MapLibre.Camera ref={cameraRef} zoom={6} center={[34.8, 31.0]} />
+        <MapLibre.UserLocation />
 
-        <MapLibreGL.ShapeSource
+        <MapLibre.GeoJSONSource
           id="locations"
-          shape={geojsonData}
+          data={geojsonData}
           cluster={true}
           clusterRadius={50}
           clusterMaxZoom={14}
           onPress={handleMapPress}
         >
           {/* Cluster Circles Layer */}
-          <MapLibreGL.CircleLayer
+          <MapLibre.Layer
             id="clusters"
+            type="circle"
             filter={['has', 'point_count']}
             style={{
               circleColor: '#3b82f6',
@@ -89,8 +105,9 @@ export default function MapView({ locations }: MapViewProps) {
           />
 
           {/* Cluster Point Counts */}
-          <MapLibreGL.SymbolLayer
+          <MapLibre.Layer
             id="cluster-count"
+            type="symbol"
             filter={['has', 'point_count']}
             style={{
               textField: '{point_count_abbreviated}',
@@ -101,8 +118,9 @@ export default function MapView({ locations }: MapViewProps) {
           />
 
           {/* Unclustered Points Layer */}
-          <MapLibreGL.CircleLayer
+          <MapLibre.Layer
             id="unclustered-point"
+            type="circle"
             filter={['!', ['has', 'point_count']]}
             style={{
               circleColor: '#ef4444',
@@ -111,8 +129,8 @@ export default function MapView({ locations }: MapViewProps) {
               circleStrokeColor: '#ffffff',
             }}
           />
-        </MapLibreGL.ShapeSource>
-      </MapLibreGL.MapView>
+        </MapLibre.GeoJSONSource>
+      </MapLibre.Map>
     </View>
   );
 }
