@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "temp-client",
-    "slug": "temp-client",
+    "name": "temp-app",
+    "slug": "temp-app",
     "version": "1.0.0",
-    "scheme": "temp-client",
+    "scheme": "temp-app",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "web": {
       "bundler": "metro",
@@ -16,9 +15,7 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-community/datetimepicker",
-      "@maplibre/maplibre-react-native",
-      "expo-secure-store"
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -26,7 +23,7 @@
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -42,7 +39,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.tempapp"
     }
   }
 }

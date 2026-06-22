@@ -2,38 +2,22 @@
 // It is safe to delete this file as it does not affect the functionality of your application.
 {
   "cesVersion": "2.21.3",
-  "projectName": "temp-client",
+  "projectName": "temp-app",
   "packages": [
-    {
-      "name": "nativewindui",
-      "type": "styling",
-      "options": {
-        "selectedComponents": [
-          "action-sheet",
-          "activity-indicator",
-          "activity-view",
-          "avatar",
-          "button",
-          "date-picker",
-          "picker",
-          "progress-indicator",
-          "ratings-indicator",
-          "slider",
-          "text",
-          "toggle"
-        ]
-      }
-    },
     {
       "name": "expo-router",
       "type": "navigation",
       "options": {
         "type": "tabs"
       }
+    },
+    {
+      "name": "nativewind",
+      "type": "styling"
     }
   ],
   "flags": {
-    "noGit": true,
+    "noGit": false,
     "noInstall": false,
     "overwrite": false,
     "importAlias": true,
@@ -43,7 +27,7 @@
   },
   "packageManager": {
     "type": "npm",
-    "version": "10.9.3"
+    "version": "11.16.0"
   },
   "os": {
     "type": "Windows_NT",
