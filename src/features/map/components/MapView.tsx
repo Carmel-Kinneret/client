@@ -1,136 +1,99 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { MapLibreGL, isMapLibreSupported } from '../utils/mapLibreLoader';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+import MapViewComponent, { Marker } from 'react-native-maps';
 import { LocationPoint } from '@/features/locations/types';
 import { useMapCamera } from '../hooks/useMapCamera';
 import { useMapStore } from '../stores/useMapStore';
+import { MapControls } from './MapControls';
 
 interface MapViewProps {
   locations: LocationPoint[];
 }
 
 export default function MapView({ locations }: MapViewProps) {
-  const { cameraRef, flyTo } = useMapCamera();
+  const { mapRef, flyTo, resetBearing } = useMapCamera();
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
+  const selectedLocation = useMapStore((s) => s.selectedLocation);
+  const userLocation = useMapStore((s) => s.userLocation);
+  const userHeading = useMapStore((s) => s.userHeading);
 
-  // Fallback for users trying to run the app in Expo Go without native modules
-  if (!isMapLibreSupported || !MapLibreGL) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ef4444', textAlign: 'center' }}>
-          MapLibre Native Module Missing!
-        </Text>
-        <Text style={{ fontSize: 15, color: '#374151', textAlign: 'center', marginTop: 10 }}>
-          This app uses custom native code for mapping and storage that is not supported by the standard Expo Go app. 
-          Please compile a custom dev client using `npx expo run:android` or `npx eas build`.
-        </Text>
-      </View>
-    );
-  }
+  const handleMarkerPress = (loc: LocationPoint) => {
+    setSelectedLocation(loc);
+    flyTo([loc.longitude, loc.latitude], 15);
+  };
 
-  const MapLibre = MapLibreGL;
-
-  // Convert locations to GeoJSON FeatureCollection
-  const geojsonData = useMemo(
-    () => ({
-      type: 'FeatureCollection' as const,
-      features: locations.map((loc) => ({
-        type: 'Feature' as const,
-        id: loc.id,
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [loc.longitude, loc.latitude],
-        },
-        properties: {
-          id: loc.id,
-          category: loc.category,
-        },
-      })),
-    }),
-    [locations]
-  );
-
-  const handleMapPress = (e: any) => {
-    const feature = e.features?.[0];
-    if (feature) {
-      if (feature.properties?.cluster) {
-        // Handle cluster press (e.g. zoom in)
-        const coords = feature.geometry.coordinates;
-        flyTo([coords[0], coords[1]], 12); // zoom in slightly to expand cluster
-      } else {
-        // Handle individual point press
-        const locationId = feature.properties?.id;
-        const loc = locations.find((l) => l.id === locationId);
-        if (loc) {
-          setSelectedLocation(loc);
-          flyTo([loc.longitude, loc.latitude], 15);
-        }
-      }
+  const handleLocateUser = () => {
+    if (userLocation) {
+      flyTo([userLocation.longitude, userLocation.latitude], 16);
     } else {
-      setSelectedLocation(null);
+      console.warn('User location not available');
     }
   };
 
+  useEffect(() => {
+    if (selectedLocation) {
+      flyTo([selectedLocation.longitude, selectedLocation.latitude], 15);
+    }
+  }, [selectedLocation]);
+
   return (
     <View style={styles.container}>
-      <MapLibre.Map
+      <MapViewComponent
+        ref={mapRef}
         style={styles.map}
-        mapStyle="https://tiles.openfreemap.org/styles/liberty"
-        logo={false}
-        attribution={true}
-        attributionPosition={{ bottom: 8, right: 8 }}
+        initialRegion={{
+          latitude: 32.73,
+          longitude: 35.25,
+          latitudeDelta: 0.35,
+          longitudeDelta: 0.35,
+        }}
+        showsUserLocation={false}
+        showsCompass={false}
+        showsMyLocationButton={false}
+        showsScale={true}
       >
-        <MapLibre.Camera ref={cameraRef} zoom={6} center={[34.8, 31.0]} />
-        <MapLibre.UserLocation />
+        {/* User Location Marker with Heading Cone */}
+        {userLocation && (
+          <Marker
+            coordinate={userLocation}
+            anchor={{ x: 0.5, y: 0.5 }}
+            flat={true}
+          >
+            <View style={styles.userMarkerContainer}>
+              {/* Heading Cone rotates with userHeading */}
+              {userHeading !== null && (
+                <View
+                  style={[
+                    styles.headingCone,
+                    { transform: [{ rotate: `${userHeading}deg` }] }
+                  ]}
+                />
+              )}
+              {/* Pulsing indicator core */}
+              <View style={styles.userPulse} />
+              <View style={styles.userDot} />
+            </View>
+          </Marker>
+        )}
 
-        <MapLibre.GeoJSONSource
-          id="locations"
-          data={geojsonData}
-          cluster={true}
-          clusterRadius={50}
-          clusterMaxZoom={14}
-          onPress={handleMapPress}
-        >
-          {/* Cluster Circles Layer */}
-          <MapLibre.Layer
-            id="clusters"
-            type="circle"
-            filter={['has', 'point_count']}
-            style={{
-              circleColor: '#3b82f6',
-              circleRadius: ['step', ['get', 'point_count'], 15, 10, 20, 50, 25],
-              circleStrokeWidth: 2,
-              circleStrokeColor: '#ffffff',
-            }}
+        {/* Location Markers */}
+        {locations.map((loc) => (
+          <Marker
+            key={loc.id}
+            coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
+            title={loc.title}
+            description={loc.description}
+            onPress={() => handleMarkerPress(loc)}
+            pinColor={selectedLocation?.id === loc.id ? '#3b82f6' : '#ef4444'}
           />
+        ))}
+      </MapViewComponent>
 
-          {/* Cluster Point Counts */}
-          <MapLibre.Layer
-            id="cluster-count"
-            type="symbol"
-            filter={['has', 'point_count']}
-            style={{
-              textField: '{point_count_abbreviated}',
-              textSize: 12,
-              textColor: '#ffffff',
-              textPitchAlignment: 'map',
-            }}
-          />
-
-          {/* Unclustered Points Layer */}
-          <MapLibre.Layer
-            id="unclustered-point"
-            type="circle"
-            filter={['!', ['has', 'point_count']]}
-            style={{
-              circleColor: '#ef4444',
-              circleRadius: 8,
-              circleStrokeWidth: 2,
-              circleStrokeColor: '#ffffff',
-            }}
-          />
-        </MapLibre.GeoJSONSource>
-      </MapLibre.Map>
+      {/* Floating Map Controls */}
+      <MapControls
+        onLocateUser={handleLocateUser}
+        onResetBearing={resetBearing}
+      />
     </View>
   );
 }
@@ -138,4 +101,43 @@ export default function MapView({ locations }: MapViewProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f3f4f6' },
   map: { flex: 1 },
+  userMarkerContainer: {
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headingCone: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    borderLeftWidth: 25,
+    borderLeftColor: 'transparent',
+    borderRightWidth: 25,
+    borderRightColor: 'transparent',
+    borderTopWidth: 60,
+    borderTopColor: 'rgba(59, 130, 246, 0.35)',
+    top: 40 - 60, // Align point of triangle to center (y = 40)
+    left: 40 - 25, // Align point of triangle to center (x = 40)
+  },
+  userPulse: {
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(59, 130, 246, 0.25)',
+  },
+  userDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#3b82f6',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
 });
