@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FlatList, RefreshControl, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { usePosts } from '../api/usePosts';
-import { PostCard } from './PostCard';
-import { PostsFilter } from './PostsFilter';
-import { PostSkeleton } from './PostSkeleton';
+import { useUserPosts } from '@/features/posts/api/useUserPosts';
+import { PostCard } from '@/features/posts/components/PostCard';
+import { PostSkeleton } from '@/features/posts/components/PostSkeleton';
+import { ProfileHeader } from './ProfileHeader';
 import { Post } from '@/lib/api/types';
 
-export const PostsFeed = () => {
+export const ProfilePostsFeed = ({ userId }: { userId: string }) => {
   const router = useRouter();
-  const [filter, setFilter] = useState('recent');
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   
@@ -22,10 +21,9 @@ export const PostsFeed = () => {
     hasNextPage,
     refetch,
     isRefetching
-  } = usePosts(); // Could pass { sort: filter } to usePosts in the future
+  } = useUserPosts(userId);
 
   const handleNavigateToMap = (lat: number, lon: number) => {
-    // Navigate back to the map screen and pass parameters
     router.push({
       pathname: '/(tabs)/',
       params: { lat: lat.toString(), lon: lon.toString() }
@@ -41,8 +39,7 @@ export const PostsFeed = () => {
   if (isLoading) {
     return (
       <View style={[styles.container, isDark && styles.containerDark]}>
-        <PostsFilter selectedId={filter} onSelect={setFilter} />
-        <PostSkeleton />
+        <ProfileHeader />
         <PostSkeleton />
         <PostSkeleton />
       </View>
@@ -55,26 +52,22 @@ export const PostsFeed = () => {
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        ListHeaderComponent={
-          <PostsFilter selectedId={filter} onSelect={setFilter} />
-        }
+        ListHeaderComponent={<ProfileHeader />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>No posts found.</Text>
+            <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>You haven't posted anything yet.</Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
         onEndReached={() => {
-          if (hasNextPage) {
-            fetchNextPage();
-          }
+          if (hasNextPage) fetchNextPage();
         }}
         onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
         ListFooterComponent={
-          isFetchingNextPage ? <PostSkeleton /> : <View style={{ height: 100 }} /> // Spacer for the tab bar
+          isFetchingNextPage ? <PostSkeleton /> : <View style={{ height: 100 }} />
         }
         showsVerticalScrollIndicator={false}
       />
@@ -85,13 +78,12 @@ export const PostsFeed = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Lightest gray for whitespace feeling
+    backgroundColor: '#f9fafb',
   },
   containerDark: {
     backgroundColor: '#111827',
   },
   listContent: {
-    paddingTop: 8,
     paddingBottom: 40,
   },
   emptyContainer: {

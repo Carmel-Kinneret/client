@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
+import { useColorScheme } from 'nativewind';
 
 export const PostSkeleton = () => {
   const animatedValue = new Animated.Value(0.3);
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   useEffect(() => {
     Animated.loop(
@@ -21,19 +24,21 @@ export const PostSkeleton = () => {
     ).start();
   }, []);
 
+  const placeholderColor = isDark ? '#374151' : '#e5e7eb';
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isDark && styles.cardDark]}>
       <View style={styles.header}>
-        <Animated.View style={[styles.avatar, { opacity: animatedValue }]} />
-        <Animated.View style={[styles.name, { opacity: animatedValue }]} />
+        <Animated.View style={[styles.avatar, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
+        <Animated.View style={[styles.name, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
       </View>
-      <Animated.View style={[styles.image, { opacity: animatedValue }]} />
+      <Animated.View style={[styles.image, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
       <View style={styles.footer}>
-        <Animated.View style={[styles.captionLine, { opacity: animatedValue }]} />
-        <Animated.View style={[styles.captionLineShort, { opacity: animatedValue }]} />
+        <Animated.View style={[styles.captionLine, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
+        <Animated.View style={[styles.captionLineShort, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
         <View style={styles.actions}>
-          <Animated.View style={[styles.actionButton, { opacity: animatedValue }]} />
-          <Animated.View style={[styles.actionButton, { opacity: animatedValue }]} />
+          <Animated.View style={[styles.actionButton, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
+          <Animated.View style={[styles.actionButton, { opacity: animatedValue, backgroundColor: placeholderColor }]} />
         </View>
       </View>
     </View>
@@ -46,13 +51,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 24,
     overflow: 'hidden',
-    // shadow for the card
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
     marginHorizontal: 16,
+  },
+  cardDark: {
+    backgroundColor: '#1f2937',
   },
   header: {
     flexDirection: 'row',
@@ -63,19 +70,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#e5e7eb',
     marginRight: 12,
   },
   name: {
     height: 16,
     width: 120,
-    backgroundColor: '#e5e7eb',
     borderRadius: 8,
   },
   image: {
     width: '100%',
     height: 300,
-    backgroundColor: '#e5e7eb',
   },
   footer: {
     padding: 16,
@@ -83,14 +87,12 @@ const styles = StyleSheet.create({
   captionLine: {
     height: 14,
     width: '100%',
-    backgroundColor: '#e5e7eb',
     borderRadius: 6,
     marginBottom: 8,
   },
   captionLineShort: {
     height: 14,
     width: '60%',
-    backgroundColor: '#e5e7eb',
     borderRadius: 6,
     marginBottom: 16,
   },
@@ -102,7 +104,6 @@ const styles = StyleSheet.create({
   actionButton: {
     height: 36,
     width: 80,
-    backgroundColor: '#e5e7eb',
     borderRadius: 18,
   },
 });

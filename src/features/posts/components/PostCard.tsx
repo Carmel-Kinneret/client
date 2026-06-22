@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Heart, MapPin } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { Post } from '@/lib/api/types';
 import { useLikePost } from '../api/usePosts';
 
@@ -11,24 +12,26 @@ interface PostCardProps {
 
 export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
   const { toggleLike } = useLikePost();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const handleLike = () => {
     toggleLike(post);
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isDark && styles.cardDark]}>
       <View style={styles.header}>
         {post.userAvatar ? (
           <Image source={{ uri: post.userAvatar }} style={styles.avatar} />
         ) : (
-          <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <Text style={styles.avatarInitial}>{post.username?.[0]?.toUpperCase() || 'U'}</Text>
+          <View style={[styles.avatar, styles.avatarPlaceholder, isDark && styles.avatarPlaceholderDark]}>
+            <Text style={[styles.avatarInitial, isDark && styles.avatarInitialDark]}>{post.username?.[0]?.toUpperCase() || 'U'}</Text>
           </View>
         )}
         <View>
-          <Text style={styles.username}>{post.username}</Text>
-          <Text style={styles.timeAgo}>
+          <Text style={[styles.username, isDark && styles.textDark]}>{post.username}</Text>
+          <Text style={[styles.timeAgo, isDark && styles.timeAgoDark]}>
             {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
           </Text>
         </View>
@@ -42,24 +45,24 @@ export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
 
       <View style={styles.footer}>
         {post.caption && (
-          <Text style={styles.caption}>
-            <Text style={styles.captionUsername}>{post.username} </Text>
+          <Text style={[styles.caption, isDark && styles.textDarkSecondary]}>
+            <Text style={[styles.captionUsername, isDark && styles.textDark]}>{post.username} </Text>
             {post.caption}
           </Text>
         )}
 
         <View style={styles.actions}>
           <TouchableOpacity 
-            style={[styles.actionButton, post.hasLiked && styles.actionButtonLiked]} 
+            style={[styles.actionButton, isDark && styles.actionButtonDark, post.hasLiked && styles.actionButtonLiked]} 
             onPress={handleLike}
             activeOpacity={0.7}
           >
             <Heart 
               size={20} 
-              color={post.hasLiked ? '#ef4444' : '#4b5563'} 
+              color={post.hasLiked ? '#ef4444' : isDark ? '#9ca3af' : '#4b5563'} 
               fill={post.hasLiked ? '#ef4444' : 'transparent'} 
             />
-            <Text style={[styles.actionText, post.hasLiked && styles.actionTextLiked]}>
+            <Text style={[styles.actionText, isDark && styles.textDarkSecondary, post.hasLiked && styles.actionTextLiked]}>
               {post.likesCount}
             </Text>
           </TouchableOpacity>
@@ -91,6 +94,9 @@ const styles = StyleSheet.create({
     elevation: 2,
     marginHorizontal: 16,
   },
+  cardDark: {
+    backgroundColor: '#1f2937',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -107,10 +113,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  avatarPlaceholderDark: {
+    backgroundColor: '#374151',
+  },
   avatarInitial: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#9ca3af',
+  },
+  avatarInitialDark: {
+    color: '#d1d5db',
   },
   username: {
     fontSize: 15,
@@ -121,6 +133,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9ca3af',
     marginTop: 2,
+  },
+  timeAgoDark: {
+    color: '#6b7280',
   },
   image: {
     width: '100%',
@@ -152,6 +167,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
   },
+  actionButtonDark: {
+    backgroundColor: '#374151',
+  },
   actionButtonLiked: {
     backgroundColor: '#fef2f2',
   },
@@ -177,5 +195,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  textDark: {
+    color: '#f9fafb',
+  },
+  textDarkSecondary: {
+    color: '#d1d5db',
   },
 });

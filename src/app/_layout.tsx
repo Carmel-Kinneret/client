@@ -15,6 +15,8 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="settings" options={{ headerShown: false, animation: 'slide_from_right' }} />
+            <Stack.Screen name="terms" options={{ headerShown: false, animation: 'slide_from_right' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </SafeAreaProvider>
