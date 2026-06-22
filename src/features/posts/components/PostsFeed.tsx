@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FlatList, RefreshControl, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { usePosts } from '../api/usePosts';
 import { PostCard } from './PostCard';
 import { PostsFilter } from './PostsFilter';
@@ -11,8 +11,7 @@ import { Post } from '@/lib/api/types';
 export const PostsFeed = () => {
   const router = useRouter();
   const [filter, setFilter] = useState('recent');
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
   
   const {
     data,

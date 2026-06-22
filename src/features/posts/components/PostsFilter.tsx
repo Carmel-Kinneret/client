@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { ChevronDown, Check } from 'lucide-react-native';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 const FILTER_OPTIONS = [
   { id: 'recent', label: 'Most Recent' },
@@ -16,18 +17,19 @@ export const PostsFilter = ({
   onSelect: (id: string) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   const selectedLabel = FILTER_OPTIONS.find(o => o.id === selectedId)?.label || 'Filter';
 
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={styles.button}
+        style={[styles.button, isDark && styles.buttonDark]}
         onPress={() => setIsOpen(true)}
         activeOpacity={0.7}
       >
-        <Text style={styles.buttonText}>{selectedLabel}</Text>
-        <ChevronDown size={16} color="#4b5563" />
+        <Text style={[styles.buttonText, isDark && styles.textDark]}>{selectedLabel}</Text>
+        <ChevronDown size={16} color={isDark ? '#d1d5db' : '#4b5563'} />
       </TouchableOpacity>
 
       <Modal
@@ -41,23 +43,32 @@ export const PostsFilter = ({
           activeOpacity={1} 
           onPress={() => setIsOpen(false)}
         >
-          <View style={styles.dropdown}>
+          <View style={[styles.dropdown, isDark && styles.dropdownDark]}>
             <Text style={styles.dropdownTitle}>Sort Posts</Text>
             {FILTER_OPTIONS.map((option) => {
               const isSelected = option.id === selectedId;
               return (
                 <TouchableOpacity
                   key={option.id}
-                  style={[styles.option, isSelected && styles.optionSelected]}
+                  style={[
+                    styles.option, 
+                    isSelected && styles.optionSelected,
+                    isDark && isSelected && styles.optionSelectedDark
+                  ]}
                   onPress={() => {
                     onSelect(option.id);
                     setIsOpen(false);
                   }}
                 >
-                  <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                  <Text style={[
+                    styles.optionText, 
+                    isDark && styles.textDarkSecondary,
+                    isSelected && styles.optionTextSelected,
+                    isDark && isSelected && styles.optionTextSelectedDark
+                  ]}>
                     {option.label}
                   </Text>
-                  {isSelected && <Check size={18} color="#3b82f6" />}
+                  {isSelected && <Check size={18} color={isDark ? '#60a5fa' : '#3b82f6'} />}
                 </TouchableOpacity>
               );
             })}
@@ -83,6 +94,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
   },
+  buttonDark: {
+    backgroundColor: '#374151',
+  },
   buttonText: {
     fontSize: 14,
     fontWeight: '600',
@@ -91,7 +105,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -105,6 +119,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 10,
+  },
+  dropdownDark: {
+    backgroundColor: '#1f2937',
+    shadowOpacity: 0.5,
   },
   dropdownTitle: {
     fontSize: 12,
@@ -125,6 +143,9 @@ const styles = StyleSheet.create({
   optionSelected: {
     backgroundColor: '#eff6ff',
   },
+  optionSelectedDark: {
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+  },
   optionText: {
     fontSize: 15,
     color: '#4b5563',
@@ -133,5 +154,14 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: '#3b82f6',
     fontWeight: '600',
+  },
+  optionTextSelectedDark: {
+    color: '#60a5fa',
+  },
+  textDark: {
+    color: '#f9fafb',
+  },
+  textDarkSecondary: {
+    color: '#d1d5db',
   },
 });

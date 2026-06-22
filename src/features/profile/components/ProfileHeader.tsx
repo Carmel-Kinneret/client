@@ -2,12 +2,11 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Settings } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 export const ProfileHeader = () => {
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   // Mock user data for now
   const user = {

@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 export const PostSkeleton = () => {
   const animatedValue = new Animated.Value(0.3);
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   useEffect(() => {
     Animated.loop(

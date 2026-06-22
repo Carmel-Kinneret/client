@@ -1,20 +1,14 @@
 import React from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
 import { Map, Moon, Database, Info, LogOut } from 'lucide-react-native';
 import { AccordionItem } from './AccordionItem';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-
 import * as Location from 'expo-location';
 
 export const SettingsList = () => {
   const router = useRouter();
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const toggleTheme = () => setColorScheme(isDark ? 'light' : 'dark');
-
-  const { locationEnabled, setLocationEnabled, mapStyle, setMapStyle, clearImageCache } = useSettingsStore();
+  const { isDarkMode: isDark, setDarkMode: toggleTheme, locationEnabled, setLocationEnabled, mapStyle, setMapStyle, clearImageCache } = useSettingsStore();
 
   const handleLocationToggle = async (value: boolean) => {
     if (value) {
@@ -45,7 +39,7 @@ export const SettingsList = () => {
           <Switch 
             value={isDark} 
             onValueChange={toggleTheme}
-            trackColor={{ false: '#d1d5db', true: '#3b82f6' }}
+            trackColor={{ false: isDark ? '#374151' : '#d1d5db', true: '#3b82f6' }}
             thumbColor={'#ffffff'}
           />
         </View>
@@ -57,7 +51,7 @@ export const SettingsList = () => {
           <Switch 
             value={locationEnabled} 
             onValueChange={handleLocationToggle}
-            trackColor={{ false: '#d1d5db', true: '#3b82f6' }}
+            trackColor={{ false: isDark ? '#374151' : '#d1d5db', true: '#3b82f6' }}
             thumbColor={'#ffffff'}
           />
         </View>
@@ -65,7 +59,7 @@ export const SettingsList = () => {
         <View style={styles.divider} />
         
         <Text style={[styles.subTitle, isDark && styles.subTitleDark]}>Map Style</Text>
-        <View style={styles.segmentedControl}>
+        <View style={[styles.segmentedControl, isDark && styles.segmentedControlDark]}>
           {['Standard', 'Satellite', 'Terrain'].map((style) => {
             const isSelected = mapStyle === style;
             return (
@@ -93,8 +87,8 @@ export const SettingsList = () => {
       </AccordionItem>
 
       <AccordionItem title="Data & Storage" icon={Database}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleClearCache}>
-          <Text style={styles.actionButtonText}>Clear Image Cache</Text>
+        <TouchableOpacity style={[styles.actionButton, isDark && styles.actionButtonDark]} onPress={handleClearCache}>
+          <Text style={[styles.actionButtonText, isDark && styles.actionButtonTextDark]}>Clear Image Cache</Text>
         </TouchableOpacity>
       </AccordionItem>
 
@@ -108,9 +102,9 @@ export const SettingsList = () => {
         </TouchableOpacity>
       </AccordionItem>
 
-      <TouchableOpacity style={styles.logoutButton}>
-        <LogOut size={20} color="#ef4444" />
-        <Text style={styles.logoutText}>Log Out</Text>
+      <TouchableOpacity style={[styles.logoutButton, isDark && styles.logoutButtonDark]}>
+        <LogOut size={20} color={isDark ? '#fca5a5' : '#ef4444'} />
+        <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Log Out</Text>
       </TouchableOpacity>
     </View>
   );
@@ -153,6 +147,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 4,
   },
+  segmentedControlDark: {
+    backgroundColor: '#1f2937',
+  },
   segment: {
     flex: 1,
     paddingVertical: 8,
@@ -192,10 +189,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  actionButtonDark: {
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+  },
   actionButtonText: {
     color: '#ef4444',
     fontWeight: '600',
     fontSize: 15,
+  },
+  actionButtonTextDark: {
+    color: '#fca5a5',
   },
   aboutRow: {
     flexDirection: 'row',
@@ -224,10 +227,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginTop: 24,
   },
+  logoutButtonDark: {
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+  },
   logoutText: {
     color: '#ef4444',
     fontWeight: 'bold',
     fontSize: 16,
     marginLeft: 8,
+  },
+  logoutTextDark: {
+    color: '#fca5a5',
   },
 });

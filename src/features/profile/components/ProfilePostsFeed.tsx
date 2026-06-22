@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, RefreshControl, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useUserPosts } from '@/features/posts/api/useUserPosts';
 import { PostCard } from '@/features/posts/components/PostCard';
 import { PostSkeleton } from '@/features/posts/components/PostSkeleton';
@@ -10,8 +10,7 @@ import { Post } from '@/lib/api/types';
 
 export const ProfilePostsFeed = ({ userId }: { userId: string }) => {
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
   
   const {
     data,

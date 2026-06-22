@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Heart, MapPin } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { Post } from '@/lib/api/types';
 import { useLikePost } from '../api/usePosts';
 
@@ -12,8 +12,7 @@ interface PostCardProps {
 
 export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
   const { toggleLike } = useLikePost();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   const handleLike = () => {
     toggleLike(post);

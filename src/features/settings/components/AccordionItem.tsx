@@ -1,7 +1,7 @@
 import React, { useState, useRef, ReactNode } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, LayoutAnimation, UIManager, Platform } from 'react-native';
 import { ChevronDown, LucideIcon } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -15,8 +15,7 @@ interface AccordionItemProps {
 
 export const AccordionItem = ({ title, icon: Icon, children }: AccordionItemProps) => {
   const [expanded, setExpanded] = useState(false);
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   const toggleAccordion = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

@@ -3,9 +3,11 @@ import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Map, MessageSquare, User, Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const BOTTOM_MARGIN = Platform.OS === 'ios' ? 32 : 24;
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <View style={{
@@ -25,18 +27,18 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         borderRadius: 32,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: isDark ? 0.3 : 0.1,
         shadowRadius: 20,
         elevation: 5,
       }}>
         <BlurView
-          tint="light"
-          intensity={80}
+          tint={isDark ? "dark" : "light"}
+          intensity={isDark ? 50 : 80}
           style={{
             ...StyleSheet.absoluteFillObject,
             borderRadius: 32,
             overflow: 'hidden',
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backgroundColor: isDark ? 'rgba(31, 41, 55, 0.5)' : 'rgba(255, 255, 255, 0.4)',
           }}
         />
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
@@ -67,7 +69,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               >
                 {options.tabBarIcon({ 
                   focused: isFocused, 
-                  color: isFocused ? '#000000' : '#9ca3af', 
+                  color: isFocused ? (isDark ? '#ffffff' : '#000000') : '#9ca3af', 
                   size: 24 
                 })}
               </TouchableOpacity>
@@ -83,18 +85,18 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         borderRadius: 32,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: isDark ? 0.3 : 0.1,
         shadowRadius: 20,
         elevation: 5,
       }}>
         <BlurView
-          tint="light"
-          intensity={80}
+          tint={isDark ? "dark" : "light"}
+          intensity={isDark ? 50 : 80}
           style={{
             ...StyleSheet.absoluteFillObject,
             borderRadius: 32,
             overflow: 'hidden',
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backgroundColor: isDark ? 'rgba(31, 41, 55, 0.5)' : 'rgba(255, 255, 255, 0.4)',
           }}
         />
         <TouchableOpacity
@@ -102,7 +104,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           onPress={() => console.log('Plus pressed')}
         >
-          <Plus color="#000000" size={28} />
+          <Plus color={isDark ? '#ffffff' : '#000000'} size={28} />
         </TouchableOpacity>
       </View>
     </View>
