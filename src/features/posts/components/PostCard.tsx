@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Heart, MapPin } from 'lucide-react-native';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import Animated, { useAnimatedStyle, withSpring, useDerivedValue } from 'react-native-reanimated';
 import { Post } from '@/lib/api/types';
 import { useLikePost } from '../api/usePosts';
 
@@ -13,6 +14,14 @@ interface PostCardProps {
 export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
   const { toggleLike } = useLikePost();
   const isDark = useSettingsStore((state) => state.isDarkMode);
+
+  const scale = useDerivedValue(() => {
+    return withSpring(post.hasLiked ? 1.2 : 1, { damping: 10, stiffness: 200 });
+  });
+
+  const heartStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }]
+  }));
 
   const handleLike = () => {
     toggleLike(post);
@@ -56,11 +65,13 @@ export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
             onPress={handleLike}
             activeOpacity={0.7}
           >
-            <Heart 
-              size={20} 
-              color={post.hasLiked ? '#ef4444' : isDark ? '#9ca3af' : '#4b5563'} 
-              fill={post.hasLiked ? '#ef4444' : 'transparent'} 
-            />
+            <Animated.View style={heartStyle}>
+              <Heart 
+                size={20} 
+                color={post.hasLiked ? '#ef4444' : isDark ? '#9ca3af' : '#4b5563'} 
+                fill={post.hasLiked ? '#ef4444' : 'transparent'} 
+              />
+            </Animated.View>
             <Text style={[styles.actionText, isDark && styles.textDarkSecondary, post.hasLiked && styles.actionTextLiked]}>
               {post.likesCount}
             </Text>

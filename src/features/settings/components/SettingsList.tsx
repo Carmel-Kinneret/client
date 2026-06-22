@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Switch, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, StyleSheet, Alert, LayoutAnimation } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Map, Moon, Database, Info, LogOut } from 'lucide-react-native';
 import { AccordionItem } from './AccordionItem';
@@ -22,6 +22,11 @@ export const SettingsList = () => {
     } else {
       setLocationEnabled(false);
     }
+  };
+
+  const handleMapStyleChange = (style: 'Standard' | 'Satellite' | 'Terrain') => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setMapStyle(style);
   };
 
   const handleClearCache = () => {
@@ -70,7 +75,7 @@ export const SettingsList = () => {
                   isSelected && styles.segmentSelected,
                   isDark && isSelected && styles.segmentSelectedDark
                 ]}
-                onPress={() => setMapStyle(style as any)}
+                onPress={() => handleMapStyleChange(style as any)}
               >
                 <Text style={[
                   styles.segmentText, 

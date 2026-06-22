@@ -115,7 +115,10 @@ export default function TabLayout() {
   return (
     <Tabs
       initialRouteName="index"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ 
+        headerShown: false,
+        animation: 'shift',
+      }}
       tabBar={(props) => <CustomTabBar {...props} />}
     >
       <Tabs.Screen

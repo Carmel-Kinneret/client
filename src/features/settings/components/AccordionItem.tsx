@@ -1,7 +1,8 @@
-import React, { useState, useRef, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, Animated, StyleSheet, LayoutAnimation, UIManager, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, UIManager, Platform } from 'react-native';
 import { ChevronDown, LucideIcon } from 'lucide-react-native';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import Animated, { useAnimatedStyle, withSpring, withTiming, useDerivedValue } from 'react-native-reanimated';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -10,17 +11,31 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 interface AccordionItemProps {
   title: string;
   icon: LucideIcon;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AccordionItem = ({ title, icon: Icon, children }: AccordionItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const isDark = useSettingsStore((state) => state.isDarkMode);
+  
+  const progress = useDerivedValue(() => 
+    expanded ? withSpring(1, { damping: 15, stiffness: 120 }) : withSpring(0, { damping: 15, stiffness: 120 })
+  );
 
   const toggleAccordion = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded(!expanded);
   };
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${progress.value * 180}deg` }]
+  }));
+
+  const contentStyle = useAnimatedStyle(() => {
+    return {
+      opacity: expanded ? withTiming(1, { duration: 250 }) : withTiming(0, { duration: 200 }),
+    };
+  });
 
   return (
     <View style={[styles.container, isDark && styles.containerDark]}>
@@ -33,15 +48,15 @@ export const AccordionItem = ({ title, icon: Icon, children }: AccordionItemProp
           <Icon size={20} color={isDark ? '#9ca3af' : '#4b5563'} />
           <Text style={[styles.title, isDark && styles.titleDark]}>{title}</Text>
         </View>
-        <Animated.View style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}>
+        <Animated.View style={chevronStyle}>
           <ChevronDown size={20} color={isDark ? '#9ca3af' : '#4b5563'} />
         </Animated.View>
       </TouchableOpacity>
       
       {expanded && (
-        <View style={styles.content}>
+        <Animated.View style={[styles.content, contentStyle]}>
           {children}
-        </View>
+        </Animated.View>
       )}
     </View>
   );

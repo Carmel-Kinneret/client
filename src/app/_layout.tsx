@@ -13,10 +13,14 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryProvider>
         <SafeAreaProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="settings" options={{ headerShown: false, animation: 'slide_from_right' }} />
-            <Stack.Screen name="terms" options={{ headerShown: false, animation: 'slide_from_right' }} />
+          <Stack screenOptions={{ 
+            gestureEnabled: true, 
+            fullScreenGestureEnabled: true,
+            animation: 'slide_from_right' 
+          }}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
+            <Stack.Screen name="settings" options={{ headerShown: false }} />
+            <Stack.Screen name="terms" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </SafeAreaProvider>
