@@ -1,22 +1,24 @@
 import { Tabs } from 'expo-router';
-import { ClarifiedAir } from '../../constants/theme';
 import { Map, List, User } from 'lucide-react-native';
+import { useColorScheme } from '@/lib/useColorScheme';
 
 export default function TabLayout() {
+  const { colors } = useColorScheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: ClarifiedAir.colors.accent,
-        tabBarInactiveTintColor: ClarifiedAir.colors.textSecondary,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
-          backgroundColor: ClarifiedAir.colors.surface,
+          backgroundColor: colors.card,
           borderTopWidth: 0,
           elevation: 8,
-          shadowColor: ClarifiedAir.shadows.floating.shadowColor,
-          shadowOffset: ClarifiedAir.shadows.floating.shadowOffset,
-          shadowOpacity: ClarifiedAir.shadows.floating.shadowOpacity,
-          shadowRadius: ClarifiedAir.shadows.floating.shadowRadius,
+          shadowColor: 'black',
+          shadowOffset: { width: 0, height: 15 },
+          shadowOpacity: 0.08,
+          shadowRadius: 25,
         },
       }}
     >

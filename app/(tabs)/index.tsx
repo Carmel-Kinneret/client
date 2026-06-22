@@ -1,5 +1,5 @@
-import { TrailMap } from '../../components/TrailMap';
+import { MapScreen as MapScreenView } from '@/src/screens/MapScreen';
 
-export default function MapScreen() {
-  return <TrailMap />;
+export default function MapTabScreen() {
+  return <MapScreenView />;
 }

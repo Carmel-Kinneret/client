@@ -1,35 +1,26 @@
-import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
-import { Slot, Stack } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
+import { Stack } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
 import '../global.css';
 
-const tokenCache = {
-  async getToken(key: string) {
-    try {
-      return await SecureStore.getItemAsync(key);
-    } catch (error) {
-      return null;
-    }
-  },
-  async saveToken(key: string, value: string) {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
-    }
-  },
-};
-
-const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || 'placeholder_key';
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <ClerkLoaded>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </ClerkLoaded>
-    </ClerkProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <BottomSheetModalProvider>
+            <StatusBar style="auto" translucent />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+          </BottomSheetModalProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
