@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function FavoritesScreen() {
+export default function MeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View className="flex-1 items-center justify-center">
-        <Text className="text-xl font-bold text-gray-800">Your Favorites</Text>
-        <Text className="text-gray-500 mt-2">Saved locations will appear here.</Text>
+        <Text className="text-xl font-bold text-gray-800">Me</Text>
+        <Text className="text-gray-500 mt-2">Your profile and settings.</Text>
       </View>
     </SafeAreaView>
   );
