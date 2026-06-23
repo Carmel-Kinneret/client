@@ -76,20 +76,33 @@ const styles = StyleSheet.create({
     borderColor: '#374151',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 16,
   },
   headerLeft: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  iconContainerDark: {
+    backgroundColor: '#374151',
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#111827',
-    marginLeft: 12,
+    textAlign: 'right',
+    marginRight: 12,
   },
   titleDark: {
     color: '#f9fafb',

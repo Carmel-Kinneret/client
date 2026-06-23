@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
-import { ChevronDown, Check } from 'lucide-react-native';
+import { ChevronDown, Check, ListFilter } from 'lucide-react-native';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 const FILTER_OPTIONS = [
-  { id: 'recent', label: 'Most Recent' },
-  { id: 'liked', label: 'Most Liked' },
-  { id: 'nearest', label: 'Nearest to me' },
+  { id: 'recent', label: 'הכי חדש' },
+  { id: 'liked', label: 'הכי אהוב' },
+  { id: 'nearest', label: 'הכי קרוב אליי' },
 ];
 
 export const PostsFilter = ({ 
@@ -19,17 +19,26 @@ export const PostsFilter = ({
   const [isOpen, setIsOpen] = useState(false);
   const isDark = useSettingsStore((state) => state.isDarkMode);
 
-  const selectedLabel = FILTER_OPTIONS.find(o => o.id === selectedId)?.label || 'Filter';
+  const getLabel = (value: string) => {
+    switch(value) {
+      case 'recent': return 'הכי חדש';
+      case 'liked': return 'הכי אהוב';
+      case 'nearest': return 'הכי קרוב אליי';
+      default: return 'סינון';
+    }
+  };
+
+  const selectedLabel = selectedId ? getLabel(selectedId) : 'סינון';
 
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={[styles.button, isDark && styles.buttonDark]}
+        style={[styles.button, isDark && styles.buttonDark]} 
         onPress={() => setIsOpen(true)}
-        activeOpacity={0.7}
       >
+        <ListFilter size={16} color={isDark ? '#e5e7eb' : '#4b5563'} />
         <Text style={[styles.buttonText, isDark && styles.textDark]}>{selectedLabel}</Text>
-        <ChevronDown size={16} color={isDark ? '#d1d5db' : '#4b5563'} />
+        <ChevronDown size={16} color={isDark ? '#e5e7eb' : '#9ca3af'} />
       </TouchableOpacity>
 
       <Modal
@@ -39,12 +48,12 @@ export const PostsFilter = ({
         onRequestClose={() => setIsOpen(false)}
       >
         <TouchableOpacity 
-          style={styles.modalOverlay} 
+          style={[styles.modalOverlay, isDark && styles.modalOverlayDark]} 
           activeOpacity={1} 
           onPress={() => setIsOpen(false)}
         >
           <View style={[styles.dropdown, isDark && styles.dropdownDark]}>
-            <Text style={styles.dropdownTitle}>Sort Posts</Text>
+            <Text style={[styles.dropdownTitle, isDark && styles.textDark]}>מיין פוסטים</Text>
             {FILTER_OPTIONS.map((option) => {
               const isSelected = option.id === selectedId;
               return (
@@ -86,10 +95,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   button: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -101,7 +110,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    marginRight: 6,
+    marginHorizontal: 6,
   },
   modalOverlay: {
     flex: 1,
@@ -131,12 +140,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 8,
     marginLeft: 8,
+    textAlign: 'right',
   },
   option: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 16,
   },
@@ -148,7 +158,8 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 15,
-    color: '#4b5563',
+    color: '#374151',
+    textAlign: 'right',
     fontWeight: '500',
   },
   optionTextSelected: {

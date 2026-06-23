@@ -22,6 +22,9 @@
       "typedRoutes": true,
       "tsconfigPaths": true
     },
+    "extra": {
+      "supportsRTL": true
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

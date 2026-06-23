@@ -124,21 +124,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Map',
+          title: 'מפה',
           tabBarIcon: ({ color, size }) => <Map color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="posts"
         options={{
-          title: 'Posts',
+          title: 'פוסטים',
           tabBarIcon: ({ color, size }) => <MessageSquare color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="me"
         options={{
-          title: 'Me',
+          title: 'אני',
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />

@@ -13,8 +13,8 @@ export function LocationDetails({ location }: LocationDetailsProps) {
 
   if (!location) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Select a location on the map to see details.</Text>
+      <View className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-lg border border-gray-100 flex-row items-center justify-center h-24">
+        <Text className="text-gray-500">בחר מיקום במפה כדי לראות פרטים.</Text>
       </View>
     );
   }
@@ -63,7 +63,7 @@ export function LocationDetails({ location }: LocationDetailsProps) {
           className="flex-1 flex-row items-center justify-center gap-2 bg-blue-600 py-3.5 rounded-xl active:bg-blue-700 shadow-sm"
         >
           <Navigation size={20} color="#ffffff" />
-          <Text className="text-white font-semibold text-[15px]">Directions</Text>
+          <Text className="text-white font-semibold text-[15px]">ניווט</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 

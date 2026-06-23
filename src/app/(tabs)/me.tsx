@@ -17,8 +17,15 @@ export default function ProfileScreen() {
       router.navigate('/posts');
     });
 
+  const flingLeft = Gesture.Fling()
+    .direction(Directions.LEFT)
+    .runOnJS(true)
+    .onEnd(() => {
+      // nowhere to go left
+    });
+
   return (
-    <GestureDetector gesture={flingRight}>
+    <GestureDetector gesture={Gesture.Exclusive(flingRight, flingLeft)}>
       <SafeAreaView style={[styles.container, isDark && styles.containerDark]} edges={['top']}>
         <ProfilePostsFeed userId="user_123" />
       </SafeAreaView>

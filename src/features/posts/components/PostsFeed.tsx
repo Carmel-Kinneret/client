@@ -58,9 +58,11 @@ export const PostsFeed = () => {
           <PostsFilter selectedId={filter} onSelect={setFilter} />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>No posts found.</Text>
-          </View>
+          !isLoading ? (
+            <View style={styles.emptyContainer}>
+              <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>לא נמצאו פוסטים.</Text>
+            </View>
+          ) : null
         }
         contentContainerStyle={styles.listContent}
         onEndReached={() => {
@@ -96,7 +98,6 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 32,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   emptyText: {
     fontSize: 16,

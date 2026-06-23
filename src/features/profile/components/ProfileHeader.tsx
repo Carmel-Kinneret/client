@@ -42,16 +42,16 @@ export const ProfileHeader = () => {
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text style={[styles.statValue, isDark && styles.textDark]}>{user.stats.posts}</Text>
-          <Text style={[styles.statLabel, isDark && styles.textDarkSecondary]}>Posts</Text>
+          <Text style={[styles.statLabel, isDark && styles.textDarkSecondary]}>פוסטים</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={[styles.statValue, isDark && styles.textDark]}>{user.stats.likes}</Text>
-          <Text style={[styles.statLabel, isDark && styles.textDarkSecondary]}>Likes</Text>
+          <Text style={[styles.statLabel, isDark && styles.textDarkSecondary]}>לייקים</Text>
         </View>
       </View>
 
       <View style={[styles.divider, isDark && styles.dividerDark]} />
-      <Text style={[styles.sectionTitle, isDark && styles.textDark]}>My Posts</Text>
+      <Text style={[styles.sectionTitle, isDark && styles.textDark]}>הפוסטים שלי</Text>
     </View>
   );
 };
@@ -63,30 +63,32 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   topRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
   },
   userInfo: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
   },
   avatar: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    marginRight: 16,
+    marginLeft: 16,
   },
   name: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#111827',
+    textAlign: 'right',
   },
   username: {
     fontSize: 14,
     color: '#6b7280',
     marginTop: 2,
+    textAlign: 'right',
   },
   settingsButton: {
     width: 44,
@@ -100,21 +102,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#374151',
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     marginBottom: 24,
   },
   statItem: {
-    marginRight: 32,
+    marginLeft: 32,
   },
   statValue: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
+    textAlign: 'right',
   },
   statLabel: {
     fontSize: 13,
     color: '#6b7280',
     marginTop: 2,
+    textAlign: 'right',
   },
   divider: {
     height: 1,
@@ -128,6 +132,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
+    textAlign: 'right',
+    width: '100%',
   },
   textDark: {
     color: '#f9fafb',

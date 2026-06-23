@@ -38,9 +38,9 @@ export const SettingsList = () => {
 
   return (
     <View style={styles.container}>
-      <AccordionItem title="Appearance" icon={Moon}>
+      <AccordionItem title="מראה" icon={Moon}>
         <View style={styles.row}>
-          <Text style={[styles.label, isDark && styles.labelDark]}>Dark Mode</Text>
+          <Text style={[styles.label, isDark && styles.labelDark]}>מצב לילה</Text>
           <Switch 
             value={isDark} 
             onValueChange={toggleTheme}
@@ -50,9 +50,9 @@ export const SettingsList = () => {
         </View>
       </AccordionItem>
 
-      <AccordionItem title="Location & Map" icon={Map}>
+      <AccordionItem title="מיקום ומפה" icon={Map}>
         <View style={styles.row}>
-          <Text style={[styles.label, isDark && styles.labelDark]}>Enable Location</Text>
+          <Text style={[styles.label, isDark && styles.labelDark]}>אפשר מיקום</Text>
           <Switch 
             value={locationEnabled} 
             onValueChange={handleLocationToggle}
@@ -63,19 +63,23 @@ export const SettingsList = () => {
         
         <View style={styles.divider} />
         
-        <Text style={[styles.subTitle, isDark && styles.subTitleDark]}>Map Style</Text>
+        <Text style={[styles.subTitle, isDark && styles.subTitleDark]}>סגנון מפה</Text>
         <View style={[styles.segmentedControl, isDark && styles.segmentedControlDark]}>
-          {['Standard', 'Satellite', 'Terrain'].map((style) => {
-            const isSelected = mapStyle === style;
+          {[
+            { id: 'Standard', label: 'רגיל' },
+            { id: 'Satellite', label: 'לוויין' },
+            { id: 'Terrain', label: 'שטח' }
+          ].map((styleObj) => {
+            const isSelected = mapStyle === styleObj.id;
             return (
               <TouchableOpacity 
-                key={style}
+                key={styleObj.id}
                 style={[
                   styles.segment, 
                   isSelected && styles.segmentSelected,
                   isDark && isSelected && styles.segmentSelectedDark
                 ]}
-                onPress={() => handleMapStyleChange(style as any)}
+                onPress={() => handleMapStyleChange(styleObj.id as any)}
               >
                 <Text style={[
                   styles.segmentText, 
@@ -83,7 +87,7 @@ export const SettingsList = () => {
                   isDark && styles.segmentTextDark,
                   isDark && isSelected && styles.segmentTextSelectedDark
                 ]}>
-                  {style}
+                  {styleObj.label}
                 </Text>
               </TouchableOpacity>
             )
@@ -91,25 +95,25 @@ export const SettingsList = () => {
         </View>
       </AccordionItem>
 
-      <AccordionItem title="Data & Storage" icon={Database}>
+      <AccordionItem title="נתונים ואחסון" icon={Database}>
         <TouchableOpacity style={[styles.actionButton, isDark && styles.actionButtonDark]} onPress={handleClearCache}>
-          <Text style={[styles.actionButtonText, isDark && styles.actionButtonTextDark]}>Clear Image Cache</Text>
+          <Text style={[styles.actionButtonText, isDark && styles.actionButtonTextDark]}>נקה מטמון תמונות</Text>
         </TouchableOpacity>
       </AccordionItem>
 
-      <AccordionItem title="About" icon={Info}>
+      <AccordionItem title="אודות" icon={Info}>
         <View style={styles.aboutRow}>
-          <Text style={[styles.label, isDark && styles.labelDark]}>Version</Text>
+          <Text style={[styles.label, isDark && styles.labelDark]}>גרסה</Text>
           <Text style={styles.valueText}>1.0.0</Text>
         </View>
         <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/terms')}>
-          <Text style={styles.linkText}>Terms of Service</Text>
+          <Text style={styles.linkText}>תנאי שימוש</Text>
         </TouchableOpacity>
       </AccordionItem>
 
       <TouchableOpacity style={[styles.logoutButton, isDark && styles.logoutButtonDark]}>
         <LogOut size={20} color={isDark ? '#fca5a5' : '#ef4444'} />
-        <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Log Out</Text>
+        <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>התנתק</Text>
       </TouchableOpacity>
     </View>
   );
@@ -119,8 +123,45 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
+  item: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  itemLeft: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  iconContainerDark: {
+    backgroundColor: '#374151',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#111827',
+    textAlign: 'right',
+  },
+  titleDark: {
+    color: '#f9fafb',
+  },
+  value: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'right',
+  },
   row: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
@@ -128,6 +169,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     color: '#374151',
+    textAlign: 'right',
   },
   labelDark: {
     color: '#d1d5db',
@@ -142,12 +184,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#4b5563',
     marginBottom: 12,
+    textAlign: 'right',
   },
   subTitleDark: {
     color: '#9ca3af',
   },
   segmentedControl: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     backgroundColor: '#f3f4f6',
     borderRadius: 8,
     padding: 4,
@@ -206,13 +249,14 @@ const styles = StyleSheet.create({
     color: '#fca5a5',
   },
   aboutRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     paddingVertical: 8,
   },
   valueText: {
     fontSize: 16,
     color: '#9ca3af',
+    textAlign: 'right',
   },
   linkButton: {
     paddingVertical: 12,
@@ -222,9 +266,10 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     fontSize: 16,
     fontWeight: '500',
+    textAlign: 'right',
   },
   logoutButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fee2e2',
@@ -239,7 +284,7 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontWeight: 'bold',
     fontSize: 16,
-    marginLeft: 8,
+    marginRight: 8,
   },
   logoutTextDark: {
     color: '#fca5a5',

@@ -53,9 +53,11 @@ export const ProfilePostsFeed = ({ userId }: { userId: string }) => {
         renderItem={renderItem}
         ListHeaderComponent={<ProfileHeader />}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>You haven't posted anything yet.</Text>
-          </View>
+          !isLoading ? (
+            <View style={styles.emptyContainer}>
+              <Text style={[styles.emptyText, isDark && styles.emptyTextDark]}>עדיין לא פרסמת כלום.</Text>
+            </View>
+          ) : null
         }
         contentContainerStyle={styles.listContent}
         onEndReached={() => {
@@ -88,7 +90,6 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 32,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   emptyText: {
     fontSize: 16,

@@ -77,13 +77,9 @@ export const PostCard = ({ post, onNavigateToMap }: PostCardProps) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.mapButton} 
-            onPress={() => onNavigateToMap(post.lat, post.lon)}
-            activeOpacity={0.7}
-          >
-            <MapPin size={18} color="#ffffff" />
-            <Text style={styles.mapButtonText}>View on Map</Text>
+          <TouchableOpacity style={[styles.mapButton, isDark && styles.mapButtonDark]} onPress={() => onNavigateToMap(post.lat, post.lon)}>
+            <MapPin size={16} color="#ffffff" />
+            <Text style={styles.mapButtonText}>הצג במפה</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -108,7 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f2937',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     padding: 16,
   },
@@ -116,7 +112,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginLeft: 12,
   },
   avatarPlaceholder: {
     backgroundColor: '#f3f4f6',
@@ -138,11 +134,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#111827',
+    textAlign: 'right',
   },
   timeAgo: {
     fontSize: 12,
     color: '#9ca3af',
     marginTop: 2,
+    textAlign: 'right',
   },
   timeAgoDark: {
     color: '#6b7280',
@@ -159,18 +157,21 @@ const styles = StyleSheet.create({
     color: '#374151',
     lineHeight: 20,
     marginBottom: 16,
+    textAlign: 'right',
+    width: '100%',
+    writingDirection: 'rtl',
   },
   captionUsername: {
     fontWeight: '600',
     color: '#111827',
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   actionButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: '#f3f4f6',
     paddingHorizontal: 16,
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2f2',
   },
   actionText: {
-    marginLeft: 6,
+    marginRight: 6,
     fontSize: 14,
     fontWeight: '600',
     color: '#4b5563',
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     color: '#ef4444',
   },
   mapButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: '#3b82f6',
     paddingHorizontal: 16,
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   mapButtonText: {
-    marginLeft: 6,
+    marginRight: 6,
     fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',

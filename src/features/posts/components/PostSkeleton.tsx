@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f2937',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     padding: 16,
   },
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginLeft: 12,
   },
   name: {
     height: 16,
@@ -88,15 +88,17 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 6,
     marginBottom: 8,
+    alignSelf: 'flex-end',
   },
   captionLineShort: {
     height: 14,
     width: '60%',
     borderRadius: 6,
     marginBottom: 16,
+    alignSelf: 'flex-end',
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
   },

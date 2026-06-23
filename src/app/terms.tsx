@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ChevronDown } from 'lucide-react-native';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 export default function TermsScreen() {
@@ -17,50 +17,48 @@ export default function TermsScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={24} color={isDark ? '#f9fafb' : '#111827'} />
+          <ChevronDown size={28} color={isDark ? '#f9fafb' : '#111827'} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, isDark && styles.headerTitleDark]}>Terms of Service</Text>
+        <Text style={[styles.headerTitle, isDark && styles.headerTitleDark]}>תנאי שימוש</Text>
         <View style={{ width: 44 }} /> 
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, isDark && styles.textDark]}>Welcome to Carmel Kinneret App</Text>
+        <Text style={[styles.title, isDark && styles.textDark]}>ברוכים הבאים לאפליקציית כרמל-כנרת</Text>
         
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          These Terms of Service ("Terms") govern your use of the Carmel Kinneret mobile application. 
-          By using our app, you agree to these terms. If you do not agree to these terms, please do not use the app.
+          על ידי שימוש באפליקציה שלנו, אתה מסכים לתנאים הבאים. אנא קרא אותם בקפידה.
+          פלטפורמה זו מיועדת לשיתוף רגעים ולגילוי מיקומים.
         </Text>
 
-        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>1. User Content</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>1. תוכן משתמש</Text>
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          When you post content (photos, captions, location data), you retain ownership of your content. 
-          However, you grant us a non-exclusive, worldwide, royalty-free license to use, store, display, 
-          and distribute your content in connection with operating the app.
+          אתה שומר על זכויות הבעלות על התוכן שאתה מפרסם, אך מעניק לנו רישיון לא בלעדי להציג
+          ולהפיץ אותו בתוך האפליקציה למשתמשים אחרים.
         </Text>
 
-        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>2. Acceptable Use</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>2. שימוש הולם</Text>
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          You agree not to post content that is illegal, abusive, harassing, or violates the rights of others. 
-          We reserve the right to remove any content or suspend accounts that violate these guidelines without prior notice.
+          אין להשתמש בפלטפורמה זו לשיתוף תוכן פוגעני, מזיק או בלתי חוקי.
+          חשבונות המפרים תנאים אלו עלולים להיחסם.
         </Text>
 
-        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>3. Location Data</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>3. נתוני מיקום</Text>
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          The app relies on location services to provide trail and point-of-interest information. 
-          You can enable or disable location services in the app settings or your device settings at any time. 
-          If disabled, some features of the app may not function properly.
+          אנו אוספים נתוני מיקום רק אם הופעלו במפורש כדי לספק תכונות תלויות-מיקום.
+          אנחנו לא מוכרים את נתוני המיקום שלך לצדדים שלישיים.
         </Text>
 
-        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>4. Disclaimer of Warranties</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>4. ויתור על אחריות</Text>
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          The app and its content are provided "as is" without warranties of any kind. 
-          We do not guarantee that the trails, POIs, or user posts are perfectly accurate or safe. 
-          Hiking involves inherent risks, and you use the app at your own risk.
+          האפליקציה ניתנת "כמות שהיא" ללא כל התחייבות או ערובה.
+          אנו לא מבטיחים זמן פעולה רצוף או אבטחת נתונים.
         </Text>
 
-        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>5. Changes to Terms</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textDark]}>5. שינויים בתנאים</Text>
         <Text style={[styles.paragraph, isDark && styles.textDarkSecondary]}>
-          We may update these terms from time to time. We will notify you of any significant changes by posting the new terms on this page.
+          אנו עשויים לעדכן את התנאים הללו מעת לעת. המשך השימוש באפליקציה
+          מהווה הסכמה לתנאים המעודכנים.
         </Text>
         
         <View style={styles.footerSpacer} />
@@ -78,7 +76,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
@@ -96,6 +94,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
+    textAlign: 'center',
+    flex: 1,
   },
   headerTitleDark: {
     color: '#f9fafb',
@@ -108,6 +108,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#111827',
     marginBottom: 16,
+    width: '100%',
+    textAlign: 'right',
   },
   sectionTitle: {
     fontSize: 18,
@@ -115,11 +117,15 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginTop: 24,
     marginBottom: 8,
+    width: '100%',
+    textAlign: 'right',
   },
   paragraph: {
     fontSize: 15,
     lineHeight: 24,
     color: '#4b5563',
+    width: '100%',
+    textAlign: 'right',
   },
   textDark: {
     color: '#f9fafb',
