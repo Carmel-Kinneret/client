@@ -1,13 +1,67 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Tabs } from 'expo-router';
+import { View, TouchableOpacity, StyleSheet, Platform, ActionSheetIOS, Alert } from 'react-native';
+import { Tabs, useRouter } from 'expo-router';
 import { Map, MessageSquare, User, Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
+import * as ImagePicker from 'expo-image-picker';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const BOTTOM_MARGIN = Platform.OS === 'ios' ? 32 : 24;
   const isDark = useSettingsStore((state) => state.isDarkMode);
+  const router = useRouter();
+
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('שגיאה', 'יש לאשר גישה למצלמה כדי לצלם תמונות.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      router.push({ pathname: '/create-post', params: { imageUri: result.assets[0].uri } });
+    }
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      router.push({ pathname: '/create-post', params: { imageUri: result.assets[0].uri } });
+    }
+  };
+
+  const handlePlusPress = () => {
+    const options = ['צלם תמונה', 'בחר מהגלריה', 'ביטול'];
+    const cancelButtonIndex = 2;
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options, cancelButtonIndex },
+        (buttonIndex) => {
+          if (buttonIndex === 0) takePhoto();
+          else if (buttonIndex === 1) pickImage();
+        }
+      );
+    } else {
+      Alert.alert(
+        'הוסף פוסט',
+        'בחר מקור תמונה',
+        [
+          { text: 'צלם תמונה', onPress: takePhoto },
+          { text: 'בחר מהגלריה', onPress: pickImage },
+          { text: 'ביטול', style: 'cancel' },
+        ]
+      );
+    }
+  };
 
   return (
     <View style={{
@@ -102,7 +156,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-          onPress={() => console.log('Plus pressed')}
+          onPress={handlePlusPress}
         >
           <Plus color={isDark ? '#ffffff' : '#000000'} size={28} />
         </TouchableOpacity>

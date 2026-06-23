@@ -24,6 +24,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false, presentation: 'modal' }} />
             <Stack.Screen name="terms" options={{ headerShown: false, presentation: 'modal' }} />
+            <Stack.Screen name="create-post" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </SafeAreaProvider>
