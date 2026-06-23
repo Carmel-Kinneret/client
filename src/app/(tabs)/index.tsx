@@ -1,12 +1,9 @@
 import React, { useMemo, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 import MapView from '@/features/map/components/MapView';
-import { SearchBar } from '@/features/search/components/SearchBar';
 import { LocationDetails } from '@/features/locations/components/LocationDetails';
-import { useSearchLocations } from '@/features/search/hooks/useSearchLocations';
 import { useMapStore } from '@/features/map/stores/useMapStore';
 import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { LocationPoint } from '@/features/locations/types';
@@ -96,16 +93,8 @@ const MOCK_LOCATIONS: LocationPoint[] = [
 ];
 
 export default function MapScreen() {
-  const insets = useSafeAreaInsets();
-  
   // Start location and heading tracking hook
   useUserLocation();
-
-  const {
-    searchQuery,
-    setSearchQuery,
-    filteredLocations,
-  } = useSearchLocations(MOCK_LOCATIONS);
 
   const selectedLocation = useMapStore(s => s.selectedLocation);
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -124,15 +113,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView locations={filteredLocations} />
-      
-      {/* Floating Header UI */}
-      <View 
-        style={{ paddingTop: Math.max(insets.top, 16) }} 
-        className="absolute top-0 left-0 right-0 z-10 px-4"
-      >
-        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-      </View>
+      <MapView locations={MOCK_LOCATIONS} />
 
       {/* Bottom Sheet */}
       <BottomSheet
