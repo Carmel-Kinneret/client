@@ -8,11 +8,11 @@ export default function NotFoundScreen() {
   return (
     
       <>
-        <Stack.Screen options={{ title: "Oops!" }} />
+        <Stack.Screen options={{ title: 'שגיאה' }} />
         <View className={styles.container}>
-          <Text className={styles.title}>{"This screen doesn't exist."}</Text>
-          <Link href="/" className={styles.link}>
-            <Text className={styles.linkText}>Go to home screen!</Text>
+          <Text className={styles.title}>{"העמוד לא קיים."}</Text>
+          <Link href="/(tabs)" className={styles.link}>
+            <Text className={styles.linkText}>חזור לעמוד הבית!</Text>
           </Link>
         </View>
       </>
