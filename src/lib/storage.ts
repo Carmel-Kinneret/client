@@ -1,48 +1,29 @@
 import { StateStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface SafeStorage {
-  set: (key: string, value: string) => void;
-  getString: (key: string) => string | undefined;
-  delete: (key: string) => void;
-}
-
-let storage: SafeStorage;
-
-try {
-  // Check if MMKV is available at runtime
-  const { MMKV } = require('react-native-mmkv');
-  storage = new MMKV({
-    id: 'map-app-storage',
-  });
-} catch (e) {
-  // Fallback to simple in-memory storage for Expo Go / web
-  console.warn('MMKV not available in this environment. Falling back to in-memory storage.');
-  const map = new Map<string, string>();
-  storage = {
-    set: (key: string, value: string) => {
-      map.set(key, value);
-    },
-    getString: (key: string) => {
-      return map.get(key);
-    },
-    delete: (key: string) => {
-      map.delete(key);
-    },
-  };
-}
-
-export { storage };
-
-// Adapter for Zustand persist middleware
+// Adapter for Zustand persist middleware using AsyncStorage
 export const zustandStorage: StateStorage = {
-  setItem: (name, value) => {
-    return storage.set(name, value);
+  setItem: async (name, value) => {
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch (e) {
+      console.error('AsyncStorage setItem error:', e);
+    }
   },
-  getItem: (name) => {
-    const value = storage.getString(name);
-    return value ?? null;
+  getItem: async (name) => {
+    try {
+      const value = await AsyncStorage.getItem(name);
+      return value ?? null;
+    } catch (e) {
+      console.error('AsyncStorage getItem error:', e);
+      return null;
+    }
   },
-  removeItem: (name) => {
-    return storage.delete(name);
+  removeItem: async (name) => {
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch (e) {
+      console.error('AsyncStorage removeItem error:', e);
+    }
   },
 };

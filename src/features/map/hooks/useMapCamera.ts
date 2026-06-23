@@ -1,30 +1,40 @@
 import { useRef } from 'react';
-import type * as MapLibreGLNamespace from '@maplibre/maplibre-react-native';
+import MapView from 'react-native-maps';
 
 export function useMapCamera() {
-  const cameraRef = useRef<MapLibreGLNamespace.CameraRef>(null);
+  const mapRef = useRef<MapView>(null);
 
-  const flyTo = (coordinates: [number, number], zoom: number = 14) => {
-    cameraRef.current?.flyTo({
-      center: coordinates,
+  const flyTo = (coordinates: [number, number], zoom: number = 15) => {
+    mapRef.current?.animateCamera({
+      center: {
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+      },
       zoom,
-      duration: 1000,
+    }, { duration: 1000 });
+  };
+
+  const fitBounds = (ne: [number, number], sw: [number, number]) => {
+    mapRef.current?.fitToCoordinates([
+      { latitude: ne[1], longitude: ne[0] },
+      { latitude: sw[1], longitude: sw[0] },
+    ], {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+      animated: true,
     });
   };
 
-  const fitBounds = (ne: [number, number], sw: [number, number], padding = 50) => {
-    cameraRef.current?.fitBounds(
-      [sw[0], sw[1], ne[0], ne[1]],
-      {
-        padding: { top: padding, right: padding, bottom: padding, left: padding },
-        duration: 1000,
-      }
-    );
+  const resetBearing = () => {
+    mapRef.current?.animateCamera({
+      heading: 0,
+      pitch: 0,
+    }, { duration: 500 });
   };
 
   return {
-    cameraRef,
+    mapRef,
     flyTo,
     fitBounds,
+    resetBearing,
   };
 }
