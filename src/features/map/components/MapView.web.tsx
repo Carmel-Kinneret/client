@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { LocationPoint } from '@/features/locations/types';
 import { useMapStore } from '../stores/useMapStore';
 import { MapControls } from './MapControls';
+import trailData from '@/constants/carmel_kinneret_clean.json';
 
 interface MapViewProps {
   locations: LocationPoint[];
@@ -40,6 +41,8 @@ export default function MapView({ locations }: MapViewProps) {
     }),
     [locations]
   );
+
+  const trailGeojsonData = useMemo(() => trailData, []);
 
   // Initialize Map
   useEffect(() => {
@@ -100,6 +103,27 @@ export default function MapView({ locations }: MapViewProps) {
     mapRef.current = map;
 
     map.on('load', () => {
+      // Add source and layer for the green trail line
+      map.addSource('trail-line', {
+        type: 'geojson',
+        data: trailGeojsonData,
+      });
+
+      map.addLayer({
+        id: 'trail-line-layer',
+        type: 'line',
+        source: 'trail-line',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#10b981',
+          'line-width': 4,
+          'line-opacity': 0.85,
+        },
+      });
+
       // Add source for locations
       map.addSource('locations', {
         type: 'geojson',
@@ -234,8 +258,12 @@ export default function MapView({ locations }: MapViewProps) {
       if (source) {
         source.setData(geojsonData);
       }
+      const lineSource = map.getSource('trail-line');
+      if (lineSource) {
+        lineSource.setData(trailGeojsonData);
+      }
     }
-  }, [geojsonData]);
+  }, [geojsonData, trailGeojsonData]);
 
   // Sync camera when selectedLocation changes externally
   useEffect(() => {
@@ -263,25 +291,34 @@ export default function MapView({ locations }: MapViewProps) {
     if (!userMarkerRef.current) {
       const container = document.createElement('div');
       container.style.position = 'relative';
-      container.style.width = '80px';
-      container.style.height = '80px';
+      container.style.width = '120px';
+      container.style.height = '120px';
       container.style.display = 'flex';
       container.style.alignItems = 'center';
       container.style.justifyContent = 'center';
 
-      // Heading cone element
+      // Heading cone element (SVG-based rounded wedge with radial gradient)
       const cone = document.createElement('div');
       cone.style.position = 'absolute';
-      cone.style.width = '0';
-      cone.style.height = '0';
-      cone.style.borderLeft = '25px solid transparent';
-      cone.style.borderRight = '25px solid transparent';
-      cone.style.borderTop = '60px solid rgba(59, 130, 246, 0.35)';
-      cone.style.top = '40px'; // center of 80px container
-      cone.style.marginTop = '-60px'; // center at y = 40px
-      cone.style.left = '15px'; // (80px - 50px) / 2
-      cone.style.transformOrigin = '50% 100%';
+      cone.style.width = '180px';
+      cone.style.height = '180px';
+      cone.style.top = '-30px'; // center 180px inside 120px container
+      cone.style.left = '-30px'; // center 180px inside 120px container
+      cone.style.transformOrigin = 'center';
       cone.style.transition = 'transform 0.2s ease-out';
+      
+      cone.innerHTML = `
+        <svg width="180" height="180" viewBox="0 0 180 180" style="display: block;">
+          <defs>
+            <radialGradient id="webConeGrad" cx="90" cy="90" r="90" fx="90" fy="90" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5" />
+              <stop offset="25%" stop-color="#3b82f6" stop-opacity="0.35" />
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <path d="M 90 90 L 45 12 A 90 90 0 0 1 135 12 Z" fill="url(#webConeGrad)" />
+        </svg>
+      `;
       
       if (userHeading !== null) {
         cone.style.transform = `rotate(${userHeading}deg)`;
@@ -294,8 +331,10 @@ export default function MapView({ locations }: MapViewProps) {
       // Pulse ring
       const pulse = document.createElement('div');
       pulse.style.position = 'absolute';
-      pulse.style.width = '22px';
-      pulse.style.height = '22px';
+      pulse.style.width = '36px';
+      pulse.style.height = '36px';
+      pulse.style.top = '42px'; // center at 60px
+      pulse.style.left = '42px'; // center at 60px
       pulse.style.borderRadius = '50%';
       pulse.style.backgroundColor = 'rgba(59, 130, 246, 0.25)';
       pulse.className = 'user-pulse-animation';
@@ -304,12 +343,15 @@ export default function MapView({ locations }: MapViewProps) {
       // Core dot
       const dot = document.createElement('div');
       dot.style.position = 'absolute';
-      dot.style.width = '14px';
-      dot.style.height = '14px';
+      dot.style.width = '20px';
+      dot.style.height = '20px';
+      dot.style.top = '50px'; // center at 60px
+      dot.style.left = '50px'; // center at 60px
       dot.style.borderRadius = '50%';
       dot.style.backgroundColor = '#3b82f6';
       dot.style.border = '2px solid #ffffff';
       dot.style.boxShadow = '0 2px 4px rgba(0,0,0,0.25)';
+      
       container.appendChild(dot);
 
       // Add CSS styles for pulsing animation
@@ -342,6 +384,7 @@ export default function MapView({ locations }: MapViewProps) {
       const marker = new maplibregl.Marker({
         element: container,
         anchor: 'center',
+        rotationAlignment: 'map',
       })
         .setLngLat([userLocation.longitude, userLocation.latitude])
         .addTo(map);
