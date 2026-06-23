@@ -5,7 +5,6 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 import MapView from '@/features/map/components/MapView';
 import { SearchBar } from '@/features/search/components/SearchBar';
-import { CategoryFilter } from '@/features/locations/components/CategoryFilter';
 import { LocationDetails } from '@/features/locations/components/LocationDetails';
 import { useSearchLocations } from '@/features/search/hooks/useSearchLocations';
 import { useMapStore } from '@/features/map/stores/useMapStore';
@@ -105,8 +104,6 @@ export default function MapScreen() {
   const {
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
     filteredLocations,
   } = useSearchLocations(MOCK_LOCATIONS);
 
@@ -135,12 +132,6 @@ export default function MapScreen() {
         className="absolute top-0 left-0 right-0 z-10 px-4"
       >
         <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-        <View className="mt-3 -mx-4">
-          <CategoryFilter 
-            selectedCategory={selectedCategory} 
-            onSelectCategory={setSelectedCategory} 
-          />
-        </View>
       </View>
 
       {/* Bottom Sheet */}
