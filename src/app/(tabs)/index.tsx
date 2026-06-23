@@ -1,66 +1,100 @@
 import React, { useMemo, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 import MapView from '@/features/map/components/MapView';
-import { MapControls } from '@/features/map/components/MapControls';
-import { SearchBar } from '@/features/search/components/SearchBar';
-import { CategoryFilter } from '@/features/locations/components/CategoryFilter';
 import { LocationDetails } from '@/features/locations/components/LocationDetails';
-import { useSearchLocations } from '@/features/search/hooks/useSearchLocations';
 import { useMapStore } from '@/features/map/stores/useMapStore';
+import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { LocationPoint } from '@/features/locations/types';
 
 // Mock locations dataset
 const MOCK_LOCATIONS: LocationPoint[] = [
   {
     id: '1',
-    title: 'Cafe Central',
-    category: 'Cafes',
-    latitude: 32.0853,
-    longitude: 34.7818,
-    description: 'A cozy place to drink coffee and read a book with a vibrant atmosphere.',
-    imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
+    title: 'Dropped Pin - Ein Dor',
+    category: 'Attractions',
+    latitude: 32.6591115,
+    longitude: 35.4372246,
+    description: 'Dropped pin near archaeological ruins and the museum of Ein Dor.',
   },
   {
     id: '2',
-    title: 'City Park',
+    title: 'Hoshaya (הושעיה)',
     category: 'Attractions',
-    latitude: 32.0910,
-    longitude: 34.7860,
-    description: 'Beautiful city park with large lakes, running trails, and picnic areas.',
-    imageUrl: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=600&q=80',
+    latitude: 32.7554904,
+    longitude: 35.2929119,
+    description: 'A beautiful community settlement situated in the lower Galilee region.',
   },
   {
     id: '3',
-    title: 'Downtown Parking',
-    category: 'Parking',
-    latitude: 32.0820,
-    longitude: 34.7800,
-    description: 'Secure, 24/7 underground parking lot in the city center.',
+    title: 'Matnas Har Yona',
+    category: 'Attractions',
+    latitude: 32.7247659,
+    longitude: 35.3185387,
+    description: 'Har Yona community center offering activities and cultural events.',
   },
   {
     id: '4',
-    title: 'Gourmet Burger Kitchen',
+    title: 'Resh Lakish Olive Press',
     category: 'Restaurants',
-    latitude: 32.0870,
-    longitude: 34.7840,
-    description: 'Award-winning handcrafted burgers and artisanal fries.',
-    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
+    latitude: 32.7497634,
+    longitude: 35.2785301,
+    description: 'Sustainable family olive press, showcasing eco-friendly oil production.',
+  },
+  {
+    id: '5',
+    title: 'Monasterio de la Sagrada Familia',
+    category: 'Attractions',
+    latitude: 32.7540443,
+    longitude: 35.2771271,
+    description: 'Historical Monastery of the Sacred Family in Nazareth region.',
+  },
+  {
+    id: '6',
+    title: 'Haunted House Garden',
+    category: 'Attractions',
+    latitude: 32.7754023,
+    longitude: 35.1705867,
+    description: 'Public garden located adjacent to the local Haunted House site.',
+  },
+  {
+    id: '7',
+    title: 'Galilean Madafeh',
+    category: 'Restaurants',
+    latitude: 32.7461479,
+    longitude: 35.1825409,
+    description: 'Authentic local cuisine featuring traditional Galilean dishes.',
+  },
+  {
+    id: '8',
+    title: 'Beit Ahva Nursing Home',
+    category: 'Other',
+    latitude: 32.7416316,
+    longitude: 35.0771505,
+    description: 'Local nursing home and community care center.',
+  },
+  {
+    id: '9',
+    title: 'Tzipor HaNefesh Gift Shop',
+    category: 'Cafes',
+    latitude: 32.7263269,
+    longitude: 35.0564095,
+    description: 'ציפור הנפש - Charming gift shop offering handcrafted goods and refreshments.',
+  },
+  {
+    id: '10',
+    title: 'Israel Trail Campground',
+    category: 'Attractions',
+    latitude: 32.7427688,
+    longitude: 35.0588734,
+    description: 'חניון שביל ישראל - Rest stop and campground along the National Israel Trail.',
   }
 ];
 
 export default function MapScreen() {
-  const insets = useSafeAreaInsets();
-  
-  const {
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    filteredLocations,
-  } = useSearchLocations(MOCK_LOCATIONS);
+  // Start location and heading tracking hook
+  useUserLocation();
 
   const selectedLocation = useMapStore(s => s.selectedLocation);
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -79,27 +113,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView locations={filteredLocations} />
-      
-      {/* Floating Header UI */}
-      <View 
-        style={{ paddingTop: Math.max(insets.top, 16) }} 
-        className="absolute top-0 left-0 right-0 z-10 px-4"
-      >
-        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-        <View className="mt-3 -mx-4">
-          <CategoryFilter 
-            selectedCategory={selectedCategory} 
-            onSelectCategory={setSelectedCategory} 
-          />
-        </View>
-      </View>
-
-      {/* Map Controls overlaid */}
-      <MapControls 
-        onLocateUser={() => { /* trigger locate user */ }} 
-        onResetBearing={() => { /* trigger reset bearing */ }} 
-      />
+      <MapView locations={MOCK_LOCATIONS} />
 
       {/* Bottom Sheet */}
       <BottomSheet

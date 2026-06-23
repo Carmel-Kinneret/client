@@ -1,136 +1,189 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { MapLibreGL, isMapLibreSupported } from '../utils/mapLibreLoader';
+import React, { useEffect, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
+import MapViewComponent, { Marker, Polyline } from 'react-native-maps';
+import Svg, { Path, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { LocationPoint } from '@/features/locations/types';
 import { useMapCamera } from '../hooks/useMapCamera';
 import { useMapStore } from '../stores/useMapStore';
+import { MapControls } from './MapControls';
+import trailData from '@/constants/carmel_kinneret_clean.json';
 
 interface MapViewProps {
   locations: LocationPoint[];
 }
 
 export default function MapView({ locations }: MapViewProps) {
-  const { cameraRef, flyTo } = useMapCamera();
+  const { mapRef, flyTo, resetBearing } = useMapCamera();
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
+  const selectedLocation = useMapStore((s) => s.selectedLocation);
+  const userLocation = useMapStore((s) => s.userLocation);
+  const userHeading = useMapStore((s) => s.userHeading);
 
-  // Fallback for users trying to run the app in Expo Go without native modules
-  if (!isMapLibreSupported || !MapLibreGL) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ef4444', textAlign: 'center' }}>
-          MapLibre Native Module Missing!
-        </Text>
-        <Text style={{ fontSize: 15, color: '#374151', textAlign: 'center', marginTop: 10 }}>
-          This app uses custom native code for mapping and storage that is not supported by the standard Expo Go app. 
-          Please compile a custom dev client using `npx expo run:android` or `npx eas build`.
-        </Text>
-      </View>
-    );
-  }
+  // Parse trail coordinates from carmel_kinneret_clean GeoJSON data
+  const trailCoords = useMemo(() => {
+    if (!trailData || !trailData.geometry || !trailData.geometry.coordinates) return [];
+    return trailData.geometry.coordinates.map((coord: any) => ({
+      latitude: coord[1],
+      longitude: coord[0],
+    }));
+  }, []);
 
-  const MapLibre = MapLibreGL;
+  const [mapBearing, setMapBearing] = React.useState(0);
+  const [isFollowingUser, setIsFollowingUser] = React.useState(false);
+  const [hasInitialFocus, setHasInitialFocus] = React.useState(false);
 
-  // Convert locations to GeoJSON FeatureCollection
-  const geojsonData = useMemo(
-    () => ({
-      type: 'FeatureCollection' as const,
-      features: locations.map((loc) => ({
-        type: 'Feature' as const,
-        id: loc.id,
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [loc.longitude, loc.latitude],
-        },
-        properties: {
-          id: loc.id,
-          category: loc.category,
-        },
-      })),
-    }),
-    [locations]
-  );
+  // Sync camera when user location changes and follow mode is active
+  useEffect(() => {
+    if (isFollowingUser && userLocation) {
+      flyTo([userLocation.longitude, userLocation.latitude], 16);
+    }
+  }, [userLocation, isFollowingUser]);
 
-  const handleMapPress = (e: any) => {
-    const feature = e.features?.[0];
-    if (feature) {
-      if (feature.properties?.cluster) {
-        // Handle cluster press (e.g. zoom in)
-        const coords = feature.geometry.coordinates;
-        flyTo([coords[0], coords[1]], 12); // zoom in slightly to expand cluster
-      } else {
-        // Handle individual point press
-        const locationId = feature.properties?.id;
-        const loc = locations.find((l) => l.id === locationId);
-        if (loc) {
-          setSelectedLocation(loc);
-          flyTo([loc.longitude, loc.latitude], 15);
-        }
-      }
+  // Initial focus on user when location is first fetched
+  useEffect(() => {
+    if (userLocation && !hasInitialFocus) {
+      setHasInitialFocus(true);
+      setIsFollowingUser(true);
+      flyTo([userLocation.longitude, userLocation.latitude], 16);
+    }
+  }, [userLocation, hasInitialFocus]);
+
+  const handleMarkerPress = (loc: LocationPoint) => {
+    setIsFollowingUser(false); // disable following when selecting a marker
+    setSelectedLocation(loc);
+    flyTo([loc.longitude, loc.latitude], 15);
+  };
+
+  const handleLocateUser = () => {
+    if (userLocation) {
+      setIsFollowingUser(true);
+      flyTo([userLocation.longitude, userLocation.latitude], 16);
     } else {
-      setSelectedLocation(null);
+      console.warn('User location not available');
     }
   };
 
+  const handleResetBearing = () => {
+    resetBearing();
+    setMapBearing(0);
+  };
+
+  useEffect(() => {
+    if (selectedLocation) {
+      setIsFollowingUser(false);
+      flyTo([selectedLocation.longitude, selectedLocation.latitude], 15);
+    }
+  }, [selectedLocation]);
+
   return (
     <View style={styles.container}>
-      <MapLibre.Map
+      <MapViewComponent
+        ref={mapRef}
         style={styles.map}
-        mapStyle="https://tiles.openfreemap.org/styles/liberty"
-        logo={false}
-        attribution={true}
-        attributionPosition={{ bottom: 8, right: 8 }}
+        initialRegion={{
+          latitude: 32.73,
+          longitude: 35.25,
+          latitudeDelta: 0.35,
+          longitudeDelta: 0.35,
+        }}
+        showsUserLocation={false}
+        showsCompass={false}
+        showsMyLocationButton={false}
+        showsScale={true}
+        onPanDrag={() => {
+          setIsFollowingUser(false);
+        }}
+        onRegionChangeComplete={async (region, details) => {
+          if (details?.isGesture) {
+            setIsFollowingUser(false);
+          }
+          if (mapRef.current) {
+            try {
+              const camera = await mapRef.current.getCamera();
+              setMapBearing(camera.heading || 0);
+            } catch (e) {
+              // Ignore errors during transition
+            }
+          }
+        }}
       >
-        <MapLibre.Camera ref={cameraRef} zoom={6} center={[34.8, 31.0]} />
-        <MapLibre.UserLocation />
+        {/* User Location Marker with Heading Cone */}
+        {userLocation && (
+          <Marker
+            coordinate={userLocation}
+            anchor={{ x: 0.5, y: 0.5 }}
+            flat={false}
+            tracksViewChanges={true}
+          >
+            <View 
+              style={[
+                styles.userMarkerContainer,
+                { paddingTop: userHeading !== null ? (Math.round(userHeading) % 2 === 0 ? 0.1 : 0) : 0 }
+              ]}
+            >
+              {/* Heading Cone rotates with userHeading adjusted for mapBearing */}
+              {userHeading !== null && (
+                <View
+                  style={[
+                    styles.headingConeContainer,
+                    { transform: [{ rotate: `${userHeading - mapBearing}deg` }] }
+                  ]}
+                >
+                  <Svg width={180} height={180} style={styles.headingConeSvg}>
+                    <Defs>
+                      <RadialGradient
+                        id="coneGrad"
+                        cx="90"
+                        cy="90"
+                        rx="90"
+                        ry="90"
+                        fx="90"
+                        fy="90"
+                        gradientUnits="userSpaceOnUse"
+                      >
+                        <Stop offset="0%" stopColor="#3b82f6" stopOpacity={0.5} />
+                        <Stop offset="25%" stopColor="#3b82f6" stopOpacity={0.35} />
+                        <Stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                      </RadialGradient>
+                    </Defs>
+                    <Path d="M 90 90 L 45 12 A 90 90 0 0 1 135 12 Z" fill="url(#coneGrad)" />
+                  </Svg>
+                </View>
+              )}
+              {/* Pulsing indicator core */}
+              <View style={styles.userPulse} />
+              <View style={styles.userDot} />
+            </View>
+          </Marker>
+        )}
 
-        <MapLibre.GeoJSONSource
-          id="locations"
-          data={geojsonData}
-          cluster={true}
-          clusterRadius={50}
-          clusterMaxZoom={14}
-          onPress={handleMapPress}
-        >
-          {/* Cluster Circles Layer */}
-          <MapLibre.Layer
-            id="clusters"
-            type="circle"
-            filter={['has', 'point_count']}
-            style={{
-              circleColor: '#3b82f6',
-              circleRadius: ['step', ['get', 'point_count'], 15, 10, 20, 50, 25],
-              circleStrokeWidth: 2,
-              circleStrokeColor: '#ffffff',
-            }}
+        {/* Green Trail Line from carmel_kinneret_clean */}
+        {trailCoords.length > 0 && (
+          <Polyline
+            coordinates={trailCoords}
+            strokeColor="#10b981"
+            strokeWidth={4}
           />
+        )}
 
-          {/* Cluster Point Counts */}
-          <MapLibre.Layer
-            id="cluster-count"
-            type="symbol"
-            filter={['has', 'point_count']}
-            style={{
-              textField: '{point_count_abbreviated}',
-              textSize: 12,
-              textColor: '#ffffff',
-              textPitchAlignment: 'map',
-            }}
+        {/* Location Markers */}
+        {locations.map((loc) => (
+          <Marker
+            key={loc.id}
+            coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
+            title={loc.title}
+            description={loc.description}
+            onPress={() => handleMarkerPress(loc)}
+            pinColor={selectedLocation?.id === loc.id ? '#3b82f6' : '#ef4444'}
           />
+        ))}
+      </MapViewComponent>
 
-          {/* Unclustered Points Layer */}
-          <MapLibre.Layer
-            id="unclustered-point"
-            type="circle"
-            filter={['!', ['has', 'point_count']]}
-            style={{
-              circleColor: '#ef4444',
-              circleRadius: 8,
-              circleStrokeWidth: 2,
-              circleStrokeColor: '#ffffff',
-            }}
-          />
-        </MapLibre.GeoJSONSource>
-      </MapLibre.Map>
+      {/* Floating Map Controls */}
+      <MapControls
+        onLocateUser={handleLocateUser}
+        onResetBearing={handleResetBearing}
+      />
     </View>
   );
 }
@@ -138,4 +191,46 @@ export default function MapView({ locations }: MapViewProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f3f4f6' },
   map: { flex: 1 },
+  userMarkerContainer: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headingConeContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 60,
+    width: 0,
+    height: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headingConeSvg: {
+    position: 'absolute',
+    top: -90,
+    left: -90,
+    width: 180,
+    height: 180,
+  },
+  userPulse: {
+    position: 'absolute',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(59, 130, 246, 0.25)',
+  },
+  userDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#3b82f6',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
 });
